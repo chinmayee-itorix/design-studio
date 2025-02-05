@@ -1,0 +1,1145 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "UBx Payments Service",
+        "x-ibm-name": "ubx-payments-service",
+        "version": "1.0.0",
+        "description": "All APIs associated with Payments product"
+    },
+    "servers": [
+        {
+            "x-name": "ubx-nonprod",
+            "x-schema": "http://",
+            "x-hostName": "internal-xpanse-sbx-datp-api-2015228706.ap-southeast-1.elb.amazonaws.com",
+            "url": "http://internal-xpanse-sbx-datp-api-2015228706.ap-southeast-1.elb.amazonaws.com/xpanse/1.0/payments",
+            "x-basePath": "/xpanse/1.0/payments"
+        },
+        {
+            "x-name": "ubx-prod",
+            "x-schema": "http://",
+            "x-hostName": "internal-xpanse-prd-datp-api-1666780372.ap-southeast-1.elb.amazonaws.com",
+            "url": "http://internal-xpanse-prd-datp-api-1666780372.ap-southeast-1.elb.amazonaws.com/xpanse/1.0/payments",
+            "x-basePath": "/xpanse/1.0/payments"
+        }
+    ],
+    "x-ibm-configuration": {
+        "cors": {
+            "enabled": true
+        },
+        "gateway": "datapower-api-gateway",
+        "type": "rest",
+        "phase": "realized",
+        "enforced": true,
+        "testable": true,
+        "assembly": {
+            "execute": [
+                {
+                    "set-variable": {
+                        "version": "2.0.0",
+                        "title": "set-variable",
+                        "actions": [
+                            {
+                                "value": "$(client)",
+                                "add": "message.headers.x-client",
+                                "type": "string"
+                            },
+                            {
+                                "value": "$(client.app.id)",
+                                "add": "message.headers.x-client-id",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "invoke": {
+                        "title": "invoke",
+                        "version": "2.0.0",
+                        "verb": "keep",
+                        "target-url": "$(target-url)",
+                        "follow-redirects": false,
+                        "timeout": 60,
+                        "parameter-control": {
+                            "type": "blocklist",
+                            "values": []
+                        },
+                        "header-control": {
+                            "type": "blocklist",
+                            "values": []
+                        },
+                        "inject-proxy-headers": true
+                    }
+                }
+            ]
+        },
+        "properties": {
+            "target-url": {
+                "value": "$(target-base-url)$(target-prefix-path)/payments",
+                "description": "The URL of the target service",
+                "encoded": false
+            }
+        }
+    },
+    "paths": {
+        "/libraries": {
+            "get": {
+                "operationId": "getPaymentServiceLibrary",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentsLibrariesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Error",
+                                        "example": [
+                                            {
+                                                "code": "400-0002",
+                                                "message": "channel is required."
+                                            },
+                                            {
+                                                "code": "400-0001",
+                                                "message": "type is invalid."
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": []
+                    },
+                    {
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "poll",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "short",
+                                "long"
+                            ]
+                        },
+                        "description": "Specify if short polling or long polling will be use",
+                        "style": "form"
+                    },
+                    {
+                        "name": "webhook",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "https://yourwebhook.com/notify",
+                        "style": "form"
+                    },
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Payment channel code that can be found in Get Payment Service Provider API",
+                        "example": "instapay",
+                        "style": "form"
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "banks",
+                                "purpose"
+                            ]
+                        },
+                        "description": "Payment channel type",
+                        "style": "form"
+                    }
+                ],
+                "tags": [
+                    "Payment Service Library"
+                ],
+                "summary": "Get Payment Service Library",
+                "description": "Get Payment Service Library"
+            }
+        },
+        "/providers": {
+            "get": {
+                "operationId": "getPaymentProviders",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "channel": {
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "library": {
+                                                "type": "array"
+                                            },
+                                            "status": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "example": [
+                                        {
+                                            "id": "INSTAPAY",
+                                            "type": "Direct to account",
+                                            "library": [
+                                                "banks",
+                                                "libraries"
+                                            ],
+                                            "status": 1
+                                        },
+                                        {
+                                            "id": "PESONET",
+                                            "type": "Direct to account",
+                                            "library": [
+                                                "banks"
+                                            ],
+                                            "status": 1
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Payment Service Provider"
+                ],
+                "summary": "Get Payment Providers",
+                "description": "Get Payment Providers"
+            }
+        },
+        "/status/{externalId}": {
+            "get": {
+                "operationId": "getPaymentStatusById",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPaymentStatusResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": []
+                    },
+                    {
+                        "x-client-secret": []
+                    }
+                ],
+                "tags": [
+                    "Payment Status"
+                ],
+                "summary": "Get Payment Status",
+                "description": "Get Payment Status"
+            },
+            "parameters": [
+                {
+                    "name": "externalId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "example": "20220408-BHUB-003"
+                    }
+                }
+            ]
+        },
+        "/initiate": {
+            "post": {
+                "operationId": "initiatePayment",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            },
+                                            "webhook": {
+                                                "example": "https://yourwebhook.com/notify",
+                                                "type": "string"
+                                            },
+                                            "externalId": {
+                                                "example": "external-000-01",
+                                                "type": "string",
+                                                "description": "A unique identifier provided by the user. This should be unique for every transaction as it will later be used in retrieving results."
+                                            },
+                                            "forApproval": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "true",
+                                                    "false"
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "externalId"
+                                        ]
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "channel": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "INSTAPAY",
+                                                    "PESONET",
+                                                    "UNIONBANK FT",
+                                                    "CEBUANA",
+                                                    "LBC",
+                                                    "PERAHUB"
+                                                ]
+                                            },
+                                            "sender": {
+                                                "$ref": "#/components/schemas/Sender"
+                                            },
+                                            "beneficiary": {
+                                                "$ref": "#/components/schemas/Beneficiary"
+                                            },
+                                            "remittance": {
+                                                "$ref": "#/components/schemas/Remittance"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "description": "Initiate Payment",
+                "security": [
+                    {
+                        "x-client-id": []
+                    },
+                    {
+                        "x-client-secret": []
+                    }
+                ],
+                "tags": [
+                    "Payment Initialization"
+                ],
+                "summary": "Initiate Payment"
+            }
+        },
+        "/report": {
+            "get": {
+                "operationId": "getPaymentReport",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": []
+                    },
+                    {
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "createdStartDate",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "2022-09-10T00:00:00.000Z",
+                        "style": "form"
+                    },
+                    {
+                        "name": "createdEndDate",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "2022-10-18T00:00:00.000Z",
+                        "style": "form"
+                    },
+                    {
+                        "name": "externalId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "EXT-ACME-XX1",
+                        "style": "form"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": 1,
+                        "style": "form"
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": 100,
+                        "style": "form"
+                    },
+                    {
+                        "name": "channel",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "instapay",
+                        "style": "form"
+                    }
+                ],
+                "tags": [
+                    "Payment Reports"
+                ],
+                "summary": "Get Payment Report",
+                "description": "Get Payment Report"
+            }
+        },
+        "/approve/{txId}": {
+            "post": {
+                "operationId": "approvePaymentByTxnId",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProcessPaymentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error",
+                                    "example": {
+                                        "code": "400-0001",
+                                        "message": "Transaction Id is invalid."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": []
+                    },
+                    {
+                        "x-client-secret": []
+                    }
+                ],
+                "tags": [
+                    "Payment Initialization"
+                ],
+                "summary": "Approve Payment By Transaction Id",
+                "description": "Approve Payment By Transaction Id"
+            },
+            "parameters": [
+                {
+                    "name": "txId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "example": "tx-1799fe69641fa0cb1131986050ffe97699582bed"
+                    }
+                }
+            ]
+        }
+    },
+    "components": {
+        "schemas": {
+            "Metadata": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "example": "acme"
+                    },
+                    "txId": {
+                        "type": "string",
+                        "example": "tx-xxxxxxxxxxxxxxxxxxxx"
+                    },
+                    "externalId": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "sequenceOfUpdate": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "completionTime": {
+                        "type": "string",
+                        "example": "2022-03-08T07:28:04.580Z"
+                    },
+                    "lastUpdated": {
+                        "type": "string",
+                        "example": "2022-03-10T08:34:34.580Z"
+                    }
+                }
+            },
+            "PaymentsLibrariesData": {
+                "type": "object",
+                "properties": {
+                    "records": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "example": [
+                            {
+                                "code": 1001,
+                                "description": "Donation"
+                            },
+                            {
+                                "code": 1002,
+                                "description": "Payment"
+                            }
+                        ]
+                    },
+                    "totalRecords": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                }
+            },
+            "PaymentsLibrariesResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport",
+                        "example": {}
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/PaymentsLibrariesData"
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "400-0002"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "channel is required."
+                    }
+                }
+            },
+            "PaymentStatusData": {
+                "type": "object",
+                "properties": {
+                    "channel": {
+                        "type": "string",
+                        "example": "UNIONBANK FT"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "example": 123.99
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "SUCCESS"
+                    },
+                    "statusCode": {
+                        "type": "string",
+                        "example": "TS"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Transaction Successful"
+                    },
+                    "paymentId": {
+                        "type": "string",
+                        "example": "XP600199"
+                    }
+                }
+            },
+            "ProgressReport": {
+                "type": "object",
+                "properties": {
+                    "channel": {
+                        "type": "string",
+                        "example": "UNIONBANK FT"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "example": 123.99
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "SUCCESS"
+                    },
+                    "statusCode": {
+                        "type": "string",
+                        "example": "TS"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Transaction Successful"
+                    },
+                    "paymentId": {
+                        "type": "string",
+                        "example": "XP600199"
+                    }
+                }
+            },
+            "GetPaymentStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/PaymentStatusData"
+                    }
+                }
+            },
+            "PaymentResponse": {
+                "type": "object",
+                "properties": {
+                    "eventType": {
+                        "type": "string",
+                        "example": "progressReport"
+                    },
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport"
+                    },
+                    "eventTime": {
+                        "type": "string",
+                        "example": "2022-04-08T01:54:05.780Z"
+                    },
+                    "deliveryTime": {
+                        "type": "string",
+                        "example": "2022-04-08T01:54:05.786Z"
+                    },
+                    "signature": {
+                        "type": "string",
+                        "example": "Eb71ExNxYTky/9+u94gI..."
+                    }
+                }
+            },
+            "Sender": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "$ref": "#/components/schemas/Name",
+                        "example": {
+                            "firstName": "John",
+                            "middleName": "Costa",
+                            "lastName": "Doe",
+                            "suffix": ""
+                        }
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/Address"
+                    }
+                }
+            },
+            "Name": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string",
+                        "example": "Gabriel"
+                    },
+                    "middleName": {
+                        "type": "string",
+                        "example": "Reel"
+                    },
+                    "lastName": {
+                        "type": "string",
+                        "example": "Carter"
+                    },
+                    "suffix": {
+                        "type": "string",
+                        "example": ""
+                    }
+                }
+            },
+            "Address": {
+                "type": "object",
+                "properties": {
+                    "line1": {
+                        "type": "string",
+                        "example": "420 Ifyoo Cee Qaye"
+                    },
+                    "barangay": {
+                        "type": "string",
+                        "example": "Santo GT"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Angeles City"
+                    },
+                    "province": {
+                        "type": "string",
+                        "example": "Pampanga"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Philippines"
+                    },
+                    "zipCode": {
+                        "type": "string",
+                        "example": 2069
+                    }
+                }
+            },
+            "Beneficiary": {
+                "type": "object",
+                "properties": {
+                    "bank": {
+                        "type": "string",
+                        "example": "XYZ Bank"
+                    },
+                    "accountNumber": {
+                        "type": "string",
+                        "example": 1111111100223
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/Name",
+                        "example": {
+                            "firstName": "Angel",
+                            "middleName": "Hanna",
+                            "lastName": "White",
+                            "suffix": ""
+                        }
+                    },
+                    "address": {
+                        "$ref": "#/components/schemas/Address"
+                    },
+                    "birthDate": {
+                        "type": "string"
+                    },
+                    "mobileNumber": {
+                        "type": "string",
+                        "example": "09151234567"
+                    },
+                    "emailAddress": {
+                        "type": "string",
+                        "example": "angel.white@norp-industries.com"
+                    },
+                    "nationality": {
+                        "type": "string",
+                        "example": "FILIPINO"
+                    }
+                }
+            },
+            "Remittance": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "string",
+                        "example": 3000
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "PHP"
+                    },
+                    "purpose": {
+                        "type": "string",
+                        "example": "Money transfer"
+                    }
+                }
+            },
+            "ProcessPaymentResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "x-client-id": {
+                "type": "apiKey",
+                "name": "x-client-id",
+                "x-key-type": "client_id",
+                "in": "header"
+            },
+            "x-client-secret": {
+                "type": "apiKey",
+                "name": "x-client-secret",
+                "x-key-type": "client_secret",
+                "in": "header"
+            }
+        }
+    },
+    "x-policies": [
+        {
+            "type": "trafficmanagement",
+            "name": "TrafficManagement",
+            "description": "Traffic management policies let you configure cache, control traffic quotas and spikes, set concurrent rate limits, and so on",
+            "policies": [
+                {
+                    "name": "spikeArrestEnv",
+                    "displayName": "Spike Arrest at Environment",
+                    "description": "Spike Arrest policy protects against traffic spikes.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "quotaAtProduct",
+                    "displayName": "Quota at Product Level",
+                    "description": "Quota policy to configure the number of request messages that an API proxy allows over a period of time.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "spikeArrestProxy",
+                    "displayName": "spikeArrestProxy",
+                    "description": "Spike Arrest policy protects against traffic spikes.",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "security",
+            "name": "Security",
+            "description": "Security policies let you control access to your APIs with OAuth, API key validation, and other threat protection features.",
+            "policies": [
+                {
+                    "name": "cors",
+                    "displayName": "CORS",
+                    "description": "Enable API's to support Cross-Origin Resource Sharing requests",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "verifyapikey",
+                    "displayName": "Verify API Key",
+                    "description": "Lets you enforce verification of API keys at runtime.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "googleIDToken",
+                    "displayName": "Google ID Token for Target Server",
+                    "description": "Lets you authenticate using Google authentication",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "validateOauthToken",
+                    "displayName": "Validate Oauth Token",
+                    "description": "Validate Oauth Token",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "clientinfo",
+                    "displayName": "clientinfo",
+                    "description": "client information",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "tonikusertoken",
+                    "displayName": "tonikusertoken",
+                    "description": "tonik user token",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "accesscontrol",
+                    "displayName": "IP Access Control",
+                    "description": "Lets you allow or deny access to your APIs by specific IP addresses.",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "logging",
+            "name": "Logging",
+            "description": "Logging policies allow you to log the request data and response data.",
+            "policies": [
+                {
+                    "name": "log",
+                    "displayName": "Logger Handler",
+                    "description": "Lets you to log the proxy data during runtime",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "generateCorrelationId",
+                    "displayName": "Generate Correlation ID",
+                    "description": "Generate unqiue correlation Id for E2E tracking",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "generateFlowName",
+                    "displayName": "Track Current Execution Flow Name",
+                    "description": "Define and track apigee's current proxy execution flow name",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "threatprotection",
+            "name": "Threat Management",
+            "description": "Threat management allow you to scan the incoming payloads for any miscellaneous content in the request.",
+            "policies": [
+                {
+                    "name": "jsonThreat",
+                    "displayName": "JSON Threat Injection",
+                    "description": "Enable payload scan for JSON content",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "xssThreat",
+                    "displayName": "XSS Injection",
+                    "description": "Scans XSS threats in request header, URI, payload",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "routing",
+            "name": "Target Server Routing Handler",
+            "description": "Endpoint routing for PowerCred micro-services",
+            "policies": [
+                {
+                    "name": "disablePathsuffix",
+                    "displayName": "Disable Proxy Base Pathsuffix",
+                    "description": "Disable pathsuffix for target routing rule",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "messageValidation",
+            "name": "Message Validation",
+            "description": "Validate Request/Response mandatory header and payload",
+            "policies": [
+                {
+                    "name": "paylaodValidation",
+                    "displayName": "Validate Request Payload",
+                    "description": "Proxy request schema validation",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "authHeaderCheck",
+                    "displayName": "Validate Mandatory Auth Header",
+                    "description": "Check proxy mandatory authorization header fields",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "requestHeaderCheck",
+                    "displayName": "Request Header Check",
+                    "description": "Request Header Check",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "custom",
+            "name": "Custom Policies",
+            "description": "Custom related policies",
+            "policies": [
+                {
+                    "name": "removeAuthHeader",
+                    "displayName": "Remove Proxy Auth Header",
+                    "description": "Policy to remove proxy auth header before routing to target server",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "customAnalytics",
+                    "displayName": "Custom Analytics",
+                    "description": "Custom Analytics",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "errorHandler",
+            "name": "Custom Error Handler",
+            "description": "Policy template related to custom fault handling",
+            "policies": [
+                {
+                    "name": "flowErrorHandler",
+                    "displayName": "Error Handler",
+                    "description": "Policy to handle custom error handling",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "targetErrorHandler",
+                    "displayName": "Target Error Handler",
+                    "description": "Policy to handle custom error handling for target servers",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "compliance",
+            "name": "Compliance",
+            "description": "Detect Compliance",
+            "policies": [
+                {
+                    "name": "complianceCall",
+                    "displayName": "ComplianceCall",
+                    "description": "call to compliance",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        }
+    ],
+    "x-proxymetadata": {},
+    "tags": [
+        {
+            "name": "Payment Service Library",
+            "description": "APIs associated with UBx Payment Service Library"
+        },
+        {
+            "name": "Payment Service Provider",
+            "description": "APIs associated with UBx Payment Service Provider"
+        },
+        {
+            "name": "Payment Status",
+            "description": "APIs associated with UBx Payment Status"
+        },
+        {
+            "name": "Payment Initialization",
+            "description": "APIs associated with Payment Initialization"
+        },
+        {
+            "name": "Payment Reports",
+            "description": "APIs associated with UBx Payment Reports"
+        }
+    ],
+    "security": [],
+    "x-mock": true,
+    "x-metadata": {
+        "metadata": {
+            "swaggerName": "69e5539a4b6041fab9a3252cf46778d2",
+            "revision": 1,
+            "documentation": [],
+            "category": [
+                {
+                    "name": "Unsorted",
+                    "paths": [
+                        "/libraries",
+                        "/providers",
+                        "/status/{externalId}",
+                        "/initiate",
+                        "/report",
+                        "/approve/{txId}"
+                    ]
+                }
+            ]
+        }
+    }
+}
