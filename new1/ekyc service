@@ -1,0 +1,1351 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "UBx eKYC Service",
+        "x-ibm-name": "ubx-ekyc-service",
+        "description": "APIs that will be associated to an ekyc process"
+    },
+    "servers": [
+        {
+            "x-name": "ubx-nonprod",
+            "x-schema": "http://",
+            "x-hostName": "internal-xpanse-sbx-datp-api-2015228706.ap-southeast-1.elb.amazonaws.com",
+            "url": "http://internal-xpanse-sbx-datp-api-2015228706.ap-southeast-1.elb.amazonaws.com/xpanse/1.0/kyc",
+            "x-basePath": "/xpanse/1.0/kyc"
+        },
+        {
+            "x-name": "ubx-prod",
+            "x-schema": "http://",
+            "x-hostName": "internal-xpanse-prd-datp-api-1666780372.ap-southeast-1.elb.amazonaws.com",
+            "url": "http://internal-xpanse-prd-datp-api-1666780372.ap-southeast-1.elb.amazonaws.com/xpanse/1.0/kyc",
+            "x-basePath": "/xpanse/1.0/kyc"
+        }
+    ],
+    "x-ibm-configuration": {
+        "properties": {
+            "target-url": {
+                "value": "$(target-base-url)$(target-prefix-path)/kyc",
+                "description": "URL of the proxy policy",
+                "encoded": false
+            }
+        },
+        "cors": {
+            "enabled": true
+        },
+        "gateway": "datapower-api-gateway",
+        "type": "rest",
+        "phase": "realized",
+        "enforced": true,
+        "testable": true,
+        "assembly": {
+            "execute": [
+                {
+                    "set-variable": {
+                        "version": "2.0.0",
+                        "title": "set-variable",
+                        "actions": [
+                            {
+                                "value": "$(client)",
+                                "add": "message.headers.x-client",
+                                "type": "string"
+                            },
+                            {
+                                "value": "$(client.app.id)",
+                                "add": "message.headers.x-client-id",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "invoke": {
+                        "title": "invoke",
+                        "version": "2.0.0",
+                        "verb": "keep",
+                        "target-url": "$(target-url)",
+                        "follow-redirects": false,
+                        "timeout": 60,
+                        "parameter-control": {
+                            "type": "blocklist",
+                            "values": []
+                        },
+                        "header-control": {
+                            "type": "blocklist",
+                            "values": []
+                        },
+                        "inject-proxy-headers": true
+                    }
+                }
+            ]
+        }
+    },
+    "paths": {
+        "/customer": {
+            "post": {
+                "operationId": "createNewCustomer",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateNewCustomerResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            },
+                                            "webhook": {
+                                                "example": "https://yourwebhook.com/notify",
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/verify": {
+            "post": {
+                "operationId": "verifyCustomerDocument",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentVerificationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            },
+                                            "webhook": {
+                                                "example": "https://yourwebhook.com/notify",
+                                                "type": "string"
+                                            },
+                                            "externalId": {
+                                                "example": "external-000-01",
+                                                "type": "string",
+                                                "description": "A unique identifier provided by the user. This should be unique for every transaction as it will later be used in retrieving results."
+                                            }
+                                        },
+                                        "required": [
+                                            "externalId"
+                                        ]
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "customerId": {
+                                                "type": "string",
+                                                "example": "c-xxxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "providerId": {
+                                                "type": "string",
+                                                "example": "ZO"
+                                            },
+                                            "documentId": {
+                                                "type": "string",
+                                                "example": "d-xxxxxxxxxxxxxxxxxxxx"
+                                            }
+                                        },
+                                        "required": [
+                                            "customerId",
+                                            "providerId",
+                                            "documentId"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/documents/{externalId}": {
+            "get": {
+                "operationId": "getDocumentUpload",
+                "description": "Retrieves the list of documents uploaded from eKYC process (liveness and id verification), can be use for manual verification of Failed/Conditional eKYC result. This API is only valid within 2days(non-prod) when the document has been uploaded. It will generate links to view/download the document (link validity is 2minutes for non-prod).",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetDocumentUploadResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "externalId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "description": "The senderReferenceId (OR externalId) that was provided in the eKYC Initialization and Document Verification API requests.",
+                    "example": "external-000-01"
+                }
+            ]
+        },
+        "/initiate": {
+            "post": {
+                "operationId": "initiateIdentityProofing",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EkycInitializationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            },
+                                            "webhook": {
+                                                "example": "https://yourwebhook.com/notify",
+                                                "type": "string"
+                                            },
+                                            "externalId": {
+                                                "example": "external-000-01",
+                                                "type": "string",
+                                                "description": "A unique identifier provided by the user. This should be unique for every transaction as it will later be used in retrieving results."
+                                            }
+                                        },
+                                        "required": [
+                                            "externalId"
+                                        ]
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "customerId": {
+                                                "type": "string",
+                                                "example": "c-xxxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "documentTypeId": {
+                                                "type": "string",
+                                                "example": "1"
+                                            },
+                                            "providerId": {
+                                                "type": "string",
+                                                "example": "ZO"
+                                            },
+                                            "countryCode": {
+                                                "type": "string",
+                                                "example": "PH"
+                                            }
+                                        },
+                                        "required": [
+                                            "customerId",
+                                            "documentTypeId",
+                                            "providerId",
+                                            "countryCode"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/face-capture": {
+            "post": {
+                "operationId": "faceCapture",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FaceCaptureResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "bizId": {
+                                                "type": "string",
+                                                "example": "xxxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "userId": {
+                                                "type": "string",
+                                                "example": "xxxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "serviceLevel": {
+                                                "type": "string",
+                                                "example": "FACECAPTURE0002"
+                                            },
+                                            "metaInfo": {
+                                                "type": "string",
+                                                "example": "MOB_H5"
+                                            },
+                                            "h5ModeConfig": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "completeCallbackUrl": {
+                                                        "type": "string",
+                                                        "example": "xxxxxxxxxxxxxxxxxxxx"
+                                                    },
+                                                    "interruptCallbackUrl": {
+                                                        "type": "string",
+                                                        "example": "xxxxxxxxxxxxxxxxxxxx"
+                                                    },
+                                                    "state": {
+                                                        "type": "string",
+                                                        "example": "xxxxxxxxxxxxxxxxxxxx"
+                                                    },
+                                                    "isIframe": {
+                                                        "type": "string",
+                                                        "example": "xxxxxxxxxxxxxxxxxxxx"
+                                                    },
+                                                    "locale": {
+                                                        "type": "string",
+                                                        "example": "xxxxxxxxxxxxxxxxxxxx"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/face-capture-check": {
+            "post": {
+                "operationId": "faceCaptureCheck",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FaceCaptureCheckResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "metadata": {
+                                        "type": "object",
+                                        "properties": {
+                                            "poll": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "short",
+                                                    "long"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "faceCaptureTxId": {
+                                                "type": "string",
+                                                "example": "xxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "bizId": {
+                                                "type": "string",
+                                                "example": "xxxxxxxxxxxxxxxxxxx"
+                                            }
+                                        },
+                                        "required": [
+                                            "faceCaptureTxId",
+                                            "bizId"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/countries": {
+            "get": {
+                "operationId": "getCountries",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "example": "PH"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Philippines"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ]
+            }
+        },
+        "/documentTypes": {
+            "get": {
+                "operationId": "getDocumentTypes",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Passport"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "providerId",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "description": "Identification string of the provider, see Get Providers API. Use to filter document types supported by the given Provider.",
+                    "example": "ZO"
+                },
+                {
+                    "name": "countryCode",
+                    "in": "query",
+                    "schema": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "description": "Identification string of the country, see Get Countries API. Use to filter document types supported by the given Country.",
+                    "example": "PH"
+                }
+            ]
+        },
+        "/providers": {
+            "get": {
+                "operationId": "getEKycProviders",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "example": [
+                                        {
+                                            "id": "XX",
+                                            "name": "Sample Provider X"
+                                        },
+                                        {
+                                            "id": "YY",
+                                            "name": "Sample Provider Y"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ]
+            }
+        },
+        "/results/{externalId}": {
+            "get": {
+                "operationId": "getEKycStatus",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetStatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "externalId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "example": "SENDER-REF-ACME123"
+                    },
+                    "description": "The *senderReferenceId* (OR *externalId*) that was set in the **eKyc Initialization** and **Document Verification** API requests."
+                }
+            ]
+        },
+        "/customer/{customerId}/document": {
+            "post": {
+                "operationId": "uploadCustomerDocument",
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "result": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "documentId": {
+                                            "type": "string",
+                                            "example": "d-xxxxxxxxxxxxxxxx"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Success"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "x-client-id": [],
+                        "x-client-secret": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "documentSide",
+                                    "file",
+                                    "documentTypeId",
+                                    "countryCode"
+                                ],
+                                "properties": {
+                                    "documentSide": {
+                                        "type": "string",
+                                        "enum": [
+                                            "front",
+                                            "back"
+                                        ],
+                                        "description": "Side of the document when scanning",
+                                        "example": "front"
+                                    },
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "documentTypeId": {
+                                        "type": "string",
+                                        "description": "Type of ID to upload. See **Get Document Types** API.",
+                                        "example": 2
+                                    },
+                                    "countryCode": {
+                                        "type": "string",
+                                        "example": "PH",
+                                        "description": "Identification string of the Country that accepts the provided document type, see Get Countries API."
+                                    }
+                                }
+                            },
+                            "examples": {}
+                        }
+                    },
+                    "required": true
+                }
+            },
+            "parameters": [
+                {
+                    "name": "customerId",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    },
+                    "description": "A unique identification string of the customer"
+                }
+            ]
+        }
+    },
+    "components": {
+        "schemas": {
+            "Metadata": {
+                "type": "object",
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "example": "acme"
+                    },
+                    "txId": {
+                        "type": "string",
+                        "example": "tx-xxxxxxxxxxxxxxxxxxxx"
+                    },
+                    "externalId": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "sequenceOfUpdate": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "completionTime": {
+                        "type": "string",
+                        "example": "2022-03-08T07:28:04.580Z"
+                    }
+                }
+            },
+            "Data": {
+                "type": "object",
+                "properties": {
+                    "tenant": {
+                        "type": "string",
+                        "example": "acme"
+                    },
+                    "customerId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ProgressReport": {
+                "type": "object"
+            },
+            "CreateNewCustomerResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport",
+                        "example": {}
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Data"
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "401-0001"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Unauthorized - Missing or invalid tenant access key."
+                    }
+                }
+            },
+            "DocumentVerificationResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/ProgressReport"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/KYCData"
+                    }
+                }
+            },
+            "KYCData": {
+                "type": "object",
+                "properties": {
+                    "customerId": {
+                        "type": "string"
+                    },
+                    "batchId": {
+                        "type": "string"
+                    },
+                    "provider": {
+                        "type": "string"
+                    },
+                    "serviceType": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "kycResult": {
+                        "type": "string"
+                    },
+                    "details": {
+                        "type": "object"
+                    }
+                }
+            },
+            "GetDocumentUploadResponse": {
+                "type": "object",
+                "properties": {
+                    "tenantId": {
+                        "type": "string"
+                    },
+                    "externalId": {
+                        "type": "string"
+                    },
+                    "linkList": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "link": {
+                                    "type": "string",
+                                    "example": "https://xyz.abc.com/sample-link"
+                                },
+                                "DocumentType": {
+                                    "type": "string",
+                                    "example": "liveliness"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "EkycProgressReport": {
+                "type": "object",
+                "properties": {
+                    "instruction": {
+                        "type": "string",
+                        "example": "qrcode-if-desktop"
+                    },
+                    "batchId": {
+                        "type": "string",
+                        "example": "b-xxxxxxxxxxxxxxxxxxxx"
+                    },
+                    "url": {
+                        "type": "string",
+                        "example": "http://example.com/xpanse/1.0/zoloz/pre-sdk/b-xxxxxxxxxxxxxxxxxxxx"
+                    },
+                    "qrcode": {
+                        "type": "string",
+                        "example": "data:image/png;base64,..."
+                    }
+                }
+            },
+            "EkycInitializationResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/EkycProgressReport"
+                    }
+                }
+            },
+            "FaceCaptureProgressReport": {
+                "type": "object"
+            },
+            "FaceCaptureResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/FaceCaptureProgressReport"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/FaceCaptureData"
+                    }
+                }
+            },
+            "FaceCaptureData": {
+                "type": "object",
+                "properties": {
+                    "transactionId": {
+                        "type": "string"
+                    },
+                    "bizId": {
+                        "type": "string"
+                    },
+                    "clientCfg": {
+                        "type": "string"
+                    },
+                    "faceCaptureUrl": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "object"
+                    }
+                }
+            },
+            "FaceCaptureCheckResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/FaceCaptureProgressReport"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/FaceCaptureCheckData"
+                    }
+                }
+            },
+            "FaceCaptureCheckData": {
+                "type": "object",
+                "properties": {
+                    "extInfo": {
+                        "type": "object"
+                    },
+                    "result": {
+                        "type": "object"
+                    }
+                }
+            },
+            "GetStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "metadata": {
+                        "$ref": "#/components/schemas/Metadata"
+                    },
+                    "progressReport": {
+                        "$ref": "#/components/schemas/EkycProgressReport"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "Unauthorized": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Error"
+                        },
+                        "example": {
+                            "code": "401-0001",
+                            "message": "Unauthorized - Missing or invalid tenant access key.\n"
+                        }
+                    }
+                }
+            },
+            "BadRequest": {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/Error",
+                                "example": {
+                                    "code": "400-0001",
+                                    "message": "External Id is invalid."
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not Found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/Error",
+                                "example": {
+                                    "code": "404-0001",
+                                    "message": "External Id not found"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "x-client-id": {
+                "type": "apiKey",
+                "name": "x-client-id",
+                "x-key-type": "client_id",
+                "in": "header"
+            },
+            "x-client-secret": {
+                "type": "apiKey",
+                "name": "x-client-secret",
+                "x-key-type": "client_secret",
+                "in": "header"
+            }
+        }
+    },
+    "x-policies": [
+        {
+            "type": "trafficmanagement",
+            "name": "TrafficManagement",
+            "description": "Traffic management policies let you configure cache, control traffic quotas and spikes, set concurrent rate limits, and so on",
+            "policies": [
+                {
+                    "name": "spikeArrestEnv",
+                    "displayName": "Spike Arrest at Environment",
+                    "description": "Spike Arrest policy protects against traffic spikes.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "quotaAtProduct",
+                    "displayName": "Quota at Product Level",
+                    "description": "Quota policy to configure the number of request messages that an API proxy allows over a period of time.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "spikeArrestProxy",
+                    "displayName": "spikeArrestProxy",
+                    "description": "Spike Arrest policy protects against traffic spikes.",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "security",
+            "name": "Security",
+            "description": "Security policies let you control access to your APIs with OAuth, API key validation, and other threat protection features.",
+            "policies": [
+                {
+                    "name": "cors",
+                    "displayName": "CORS",
+                    "description": "Enable API's to support Cross-Origin Resource Sharing requests",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "verifyapikey",
+                    "displayName": "Verify API Key",
+                    "description": "Lets you enforce verification of API keys at runtime.",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "googleIDToken",
+                    "displayName": "Google ID Token for Target Server",
+                    "description": "Lets you authenticate using Google authentication",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "validateOauthToken",
+                    "displayName": "Validate Oauth Token",
+                    "description": "Validate Oauth Token",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "clientinfo",
+                    "displayName": "clientinfo",
+                    "description": "client information",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "tonikusertoken",
+                    "displayName": "tonikusertoken",
+                    "description": "tonik user token",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "accesscontrol",
+                    "displayName": "IP Access Control",
+                    "description": "Lets you allow or deny access to your APIs by specific IP addresses.",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "logging",
+            "name": "Logging",
+            "description": "Logging policies allow you to log the request data and response data.",
+            "policies": [
+                {
+                    "name": "log",
+                    "displayName": "Logger Handler",
+                    "description": "Lets you to log the proxy data during runtime",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "generateCorrelationId",
+                    "displayName": "Generate Correlation ID",
+                    "description": "Generate unqiue correlation Id for E2E tracking",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "generateFlowName",
+                    "displayName": "Track Current Execution Flow Name",
+                    "description": "Define and track apigee's current proxy execution flow name",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "threatprotection",
+            "name": "Threat Management",
+            "description": "Threat management allow you to scan the incoming payloads for any miscellaneous content in the request.",
+            "policies": [
+                {
+                    "name": "jsonThreat",
+                    "displayName": "JSON Threat Injection",
+                    "description": "Enable payload scan for JSON content",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "xssThreat",
+                    "displayName": "XSS Injection",
+                    "description": "Scans XSS threats in request header, URI, payload",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "routing",
+            "name": "Target Server Routing Handler",
+            "description": "Endpoint routing for PowerCred micro-services",
+            "policies": [
+                {
+                    "name": "disablePathsuffix",
+                    "displayName": "Disable Proxy Base Pathsuffix",
+                    "description": "Disable pathsuffix for target routing rule",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "messageValidation",
+            "name": "Message Validation",
+            "description": "Validate Request/Response mandatory header and payload",
+            "policies": [
+                {
+                    "name": "paylaodValidation",
+                    "displayName": "Validate Request Payload",
+                    "description": "Proxy request schema validation",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "authHeaderCheck",
+                    "displayName": "Validate Mandatory Auth Header",
+                    "description": "Check proxy mandatory authorization header fields",
+                    "enabled": true,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "requestHeaderCheck",
+                    "displayName": "Request Header Check",
+                    "description": "Request Header Check",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "custom",
+            "name": "Custom Policies",
+            "description": "Custom related policies",
+            "policies": [
+                {
+                    "name": "removeAuthHeader",
+                    "displayName": "Remove Proxy Auth Header",
+                    "description": "Policy to remove proxy auth header before routing to target server",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "customAnalytics",
+                    "displayName": "Custom Analytics",
+                    "description": "Custom Analytics",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "errorHandler",
+            "name": "Custom Error Handler",
+            "description": "Policy template related to custom fault handling",
+            "policies": [
+                {
+                    "name": "flowErrorHandler",
+                    "displayName": "Error Handler",
+                    "description": "Policy to handle custom error handling",
+                    "enabled": false,
+                    "applyToFlow": false
+                },
+                {
+                    "name": "targetErrorHandler",
+                    "displayName": "Target Error Handler",
+                    "description": "Policy to handle custom error handling for target servers",
+                    "enabled": false,
+                    "applyToFlow": false
+                }
+            ]
+        },
+        {
+            "type": "compliance",
+            "name": "Compliance",
+            "description": "Detect Compliance",
+            "policies": [
+                {
+                    "name": "complianceCall",
+                    "displayName": "ComplianceCall",
+                    "description": "call to compliance",
+                    "enabled": true,
+                    "applyToFlow": false
+                }
+            ]
+        }
+    ],
+    "x-proxymetadata": {}
+}
