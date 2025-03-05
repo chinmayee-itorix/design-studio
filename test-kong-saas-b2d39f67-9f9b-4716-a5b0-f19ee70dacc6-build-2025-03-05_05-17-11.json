@@ -1,0 +1,251 @@
+{
+  "id" : "67c7de571b33b530e88082ca",
+  "cts" : 1741151831410,
+  "mts" : 1741151831410,
+  "createdBy" : "sireesha sireesha",
+  "modifiedBy" : "sireesha sireesha",
+  "kongAdminHost" : "https://in.api.konghq.com",
+  "runtime" : "test-kong-saas",
+  "controlPlane" : "Gateway",
+  "controlPlaneId" : "b2d39f67-9f9b-4716-a5b0-f19ee70dacc6",
+  "swaggerId" : "67c6ef6137bdf74afa9de968",
+  "serviceName" : "mobile-subscriber-api-check",
+  "revision" : 1,
+  "swaggerVersion" : "3.0",
+  "swaggerName" : "Mobile Subscriber API",
+  "serviceId" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4",
+  "service" : {
+    "serviceName" : "mobile-subscriber-api-check",
+    "protocol" : "https",
+    "host" : "api.telecomservice.com",
+    "hosts" : [ "api.telecomservice.com" ],
+    "basePath" : "/v1/mobile-subscriber",
+    "basePaths" : [ "/v1/mobile-subscriber" ],
+    "port" : 80,
+    "ports" : [ -1 ],
+    "metadata" : {
+      "retries" : 5,
+      "connect_timeout" : 60000,
+      "write_timeout" : 60000,
+      "read_timeout" : 60000
+    },
+    "kongKonnectPayload" : { }
+  },
+  "routes" : [ {
+    "routeId" : "139adf5a-0eb5-4954-a26a-02b2251ca165",
+    "routeName" : "getCustomer",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/customers/{customerId}" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "e7b74387-d5c8-4418-b380-3892db8b91a0",
+    "routeName" : "updateCustomer",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "PUT" ],
+    "paths" : [ "/customers/{customerId}" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "ed48baed-1074-4671-aec2-0e2731ea3235",
+    "routeName" : "getPlan",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/plans/{planId}" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "587b3d2f-38e9-4e5c-ae18-e2b8d8a5b87e",
+    "routeName" : "getPlans",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/plans" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "f967d657-b428-479b-9918-85f83c329120",
+    "routeName" : "createCustomer",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "POST" ],
+    "paths" : [ "/customers" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "255e8d77-32b9-44bb-82c3-f72d5671e505",
+    "routeName" : "getCustomers",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/customers" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeName" : "getAccountBalance",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/accounts/{customerId}/balance" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  }, {
+    "routeId" : "7038cdb1-92a0-4bb5-b213-3fc477bdafc1",
+    "routeName" : "getUsageData",
+    "service" : {
+      "_id" : "8b5dd2b6-2a95-4fe8-96e1-9977875656d4"
+    },
+    "protocols" : [ "https" ],
+    "methods" : [ "GET" ],
+    "paths" : [ "/usage/{customerId}" ],
+    "metadata" : {
+      "headers" : [ ],
+      "path_handling" : "v0",
+      "hosts" : [ ],
+      "regex_priority" : 0,
+      "preserve_host" : false,
+      "strip_path" : false
+    },
+    "kongRuntime" : {
+      "name" : "test-kong-saas",
+      "kongAdminToken" : "kpat_8ATgDx2jRzGmFyyA3q0NvngrfBwY89nzC39jniEDJslTLV8eB",
+      "kongAdminHost" : "https://in.api.konghq.com",
+      "tier" : "free",
+      "type" : "saas",
+      "workspaceCount" : 0,
+      "readOnly" : false,
+      "dbless" : false
+    }
+  } ],
+  "plugins" : [ ]
+}
